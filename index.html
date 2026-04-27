@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>HFK 멤버 로드맵 관리자</title>
+<style>
+  :root {
+    --hfk-burgundy: #441a15;
+    --hfk-red: #970101;
+    --hfk-coral: #ff6154;
+    --hfk-cream: #f5efe6;
+    --hfk-charcoal: #2d2523;
+    --text-dark: #2d2523;
+    --text-muted: #6b5c54;
+    --border: #e3d9cc;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Segoe UI', Roboto, sans-serif;
+    background: var(--hfk-cream);
+    color: var(--text-dark);
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+  header {
+    border-bottom: 2px solid var(--hfk-burgundy);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+  h1 {
+    margin: 0 0 4px; font-size: 22px; font-weight: 700;
+    color: var(--hfk-burgundy);
+  }
+  .sub { color: var(--text-muted); font-size: 13px; }
+
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    margin-bottom: 20px; align-items: center;
+  }
+  .toolbar input[type="text"] {
+    flex: 1 1 240px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+  }
+  .toolbar select {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+  }
+  .stats {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+  .stats b { color: var(--hfk-burgundy); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .15s, transform .15s;
+    display: block;
+  }
+  .card:hover {
+    border-color: var(--hfk-burgundy);
+    transform: translateY(-1px);
+  }
+  .card-name {
+    font-weight: 700; font-size: 15px; margin: 0 0 4px;
+    color: var(--hfk-charcoal);
+  }
+  .card-meta {
+    font-size: 12px; color: var(--text-muted);
+    display: flex; flex-wrap: wrap; gap: 6px 10px;
+  }
+  .card-meta span::before { content: "·"; margin-right: 6px; color: var(--border); }
+  .card-meta span:first-child::before { content: ""; margin: 0; }
+  .card-tags {
+    margin-top: 8px;
+    display: flex; flex-wrap: wrap; gap: 4px;
+  }
+  .tag {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: var(--hfk-cream);
+    color: var(--hfk-burgundy);
+    border: 1px solid var(--border);
+  }
+  .tag.returning { background: var(--hfk-burgundy); color: white; border-color: var(--hfk-burgundy); }
+  .tag.first { background: white; color: var(--text-muted); }
+  .tag.has-4l { background: var(--hfk-coral); color: white; border-color: var(--hfk-coral); }
+
+  .empty, .error {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .error { color: var(--hfk-red); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>HFK 멤버 로드맵 관리자</h1>
+    <div class="sub">전체 멤버 그리드 · 카드 클릭 시 해당 멤버 로드맵 페이지로 이동</div>
+  </header>
+
+  <div class="toolbar">
+    <input type="text" id="search" placeholder="이름·회사·직무·팀 검색...">
+    <select id="filter-reg">
+      <option value="all">전체 등록</option>
+      <option value="returning">재등록만</option>
+      <option value="first">첫등록만</option>
+    </select>
+    <select id="filter-season">
+      <option value="all">전체 시즌</option>
+    </select>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div id="grid" class="grid"></div>
+</div>
+
+<script>
+const ADMIN_INDEX_URL = 'https://skaug12.github.io/hfk-dashboards/data/admin_index.json';
+const MEMBER_PAGE_BASE = 'https://skaug12.github.io/hfk-dashboards/member.html';
+
+const $ = id => document.getElementById(id);
+const escapeHtml = s => (s ?? '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let ALL = [];
+
+function render() {
+  const q = $('search').value.trim().toLowerCase();
+  const reg = $('filter-reg').value;
+  const season = $('filter-season').value;
+
+  const filtered = ALL.filter(m => {
+    if (reg === 'returning' && !m.returning) return false;
+    if (reg === 'first' && m.returning) return false;
+    if (season !== 'all' && m.latest_season !== season) return false;
+    if (q) {
+      const hay = [m.name, m.company, m.function, m.latest_team].filter(Boolean).join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  $('stats').innerHTML = `<b>${filtered.length}</b>명 / 전체 ${ALL.length}명`;
+
+  if (!filtered.length) {
+    $('grid').innerHTML = '<div class="empty">검색 결과 없음</div>';
+    return;
+  }
+
+  $('grid').innerHTML = filtered.map(m => {
+    const tags = [];
+    if (m.returning) tags.push(`<span class="tag returning">재등록 ${m.total_count}회</span>`);
+    else tags.push('<span class="tag first">첫등록</span>');
+    if (m.has_4l) tags.push('<span class="tag has-4l">4L</span>');
+
+    const meta = [];
+    if (m.company) meta.push(`<span>${escapeHtml(m.company)}</span>`);
+    if (m.function) meta.push(`<span>${escapeHtml(m.function)}</span>`);
+    if (m.years_now != null) meta.push(`<span>${m.years_now}년차</span>`);
+
+    const seasonLine = m.latest_season
+      ? `<div class="card-meta" style="margin-top:6px;"><span>최근: ${escapeHtml(m.latest_season)} · ${escapeHtml(m.latest_team || '-')}</span></div>`
+      : '';
+
+    return `<a class="card" href="${MEMBER_PAGE_BASE}?t=${encodeURIComponent(m.token)}" target="_blank" rel="noopener">
+      <div class="card-name">${escapeHtml(m.name)}</div>
+      <div class="card-meta">${meta.join('')}</div>
+      ${seasonLine}
+      <div class="card-tags">${tags.join('')}</div>
+    </a>`;
+  }).join('');
+}
+
+function populateSeasons(seasons) {
+  const sel = $('filter-season');
+  // 최신 시즌이 위에 오도록 역순
+  [...seasons].reverse().forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s; opt.textContent = s;
+    sel.appendChild(opt);
+  });
+}
+
+fetch(ADMIN_INDEX_URL)
+  .then(r => {
+    if (!r.ok) throw new Error('admin_index.json 로드 실패 (' + r.status + ')');
+    return r.json();
+  })
+  .then(data => {
+    ALL = data.members || [];
+    populateSeasons(data.season_order || []);
+    ['search', 'filter-reg', 'filter-season'].forEach(id => $(id).addEventListener('input', render));
+    render();
+  })
+  .catch(err => {
+    $('grid').innerHTML = `<div class="error">${escapeHtml(err.message || String(err))}</div>`;
+    console.error(err);
+  });
+</script>
+</body>
+</html>
