@@ -1,225 +1,1044 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>HFK 멤버 로드맵 관리자</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
 <style>
-  :root {
-    --hfk-burgundy: #441a15;
-    --hfk-red: #970101;
-    --hfk-coral: #ff6154;
-    --hfk-cream: #f5efe6;
-    --hfk-charcoal: #2d2523;
-    --text-dark: #2d2523;
-    --text-muted: #6b5c54;
-    --border: #e3d9cc;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; padding: 24px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Segoe UI', Roboto, sans-serif;
-    background: var(--hfk-cream);
-    color: var(--text-dark);
-    line-height: 1.5;
-  }
-  .wrap { max-width: 1400px; margin: 0 auto; }
-  header {
-    border-bottom: 2px solid var(--hfk-burgundy);
-    padding-bottom: 16px;
-    margin-bottom: 24px;
-  }
-  h1 {
-    margin: 0 0 4px; font-size: 22px; font-weight: 700;
-    color: var(--hfk-burgundy);
-  }
-  .sub { color: var(--text-muted); font-size: 13px; }
+:root {
+  --hfk-red: #970101;
+  --hfk-burgundy: #441a15;
+  --hfk-coral: #ff6154;
+  --hfk-sand: #ceb9a4;
+  --hfk-cream: #e1dac9;
+  --hfk-white: #f0eae2;
+  --hfk-charcoal: #2d2523;
+  --text-dark: #222;
+  --text: #444;
+  --text-light: #555;
+  --text-muted: #888;
+  --bg-warm: #F5EBE0;
+  --bg-accent: #F0EAE2;
+  --border: #ddd;
+  --border-light: #e5e5e5;
+  --border-subtle: #eee;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-warm);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 720px; margin: 0 auto; padding: 32px 20px 96px; }
 
-  .toolbar {
-    display: flex; flex-wrap: wrap; gap: 12px;
-    margin-bottom: 20px; align-items: center;
-  }
-  .toolbar input[type="text"] {
-    flex: 1 1 240px;
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 14px;
-    background: white;
-  }
-  .toolbar select {
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 14px;
-    background: white;
-  }
-  .stats {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-left: auto;
-  }
-  .stats b { color: var(--hfk-burgundy); }
+/* Header */
+.topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.topbar a { color: var(--text-muted); text-decoration: none; font-size: 13px; }
+.topbar a:hover { color: var(--hfk-red); }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 12px;
-  }
-  .card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    text-decoration: none;
-    color: inherit;
-    transition: border-color .15s, transform .15s;
-    display: block;
-  }
-  .card:hover {
-    border-color: var(--hfk-burgundy);
-    transform: translateY(-1px);
-  }
-  .card-name {
-    font-weight: 700; font-size: 15px; margin: 0 0 4px;
-    color: var(--hfk-charcoal);
-  }
-  .card-meta {
-    font-size: 12px; color: var(--text-muted);
-    display: flex; flex-wrap: wrap; gap: 6px 10px;
-  }
-  .card-meta span::before { content: "·"; margin-right: 6px; color: var(--border); }
-  .card-meta span:first-child::before { content: ""; margin: 0; }
-  .card-tags {
-    margin-top: 8px;
-    display: flex; flex-wrap: wrap; gap: 4px;
-  }
-  .tag {
-    font-size: 11px;
-    padding: 2px 7px;
-    border-radius: 10px;
-    background: var(--hfk-cream);
-    color: var(--hfk-burgundy);
-    border: 1px solid var(--border);
-  }
-  .tag.returning { background: var(--hfk-burgundy); color: white; border-color: var(--hfk-burgundy); }
-  .tag.first { background: white; color: var(--text-muted); }
-  .tag.has-4l { background: var(--hfk-coral); color: white; border-color: var(--hfk-coral); }
+/* Search view */
+.search-view h1 { font-size: 24px; color: var(--hfk-burgundy); margin: 0 0 6px; letter-spacing: -0.02em; }
+.search-view p { color: var(--text-muted); font-size: 14px; margin: 0 0 20px; }
+.search-input {
+  width: 100%; padding: 12px 16px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 15px; font-family: inherit;
+  background: #fff;
+}
+.search-input:focus { outline: none; border-color: var(--hfk-burgundy); }
+.search-results { margin-top: 16px; max-height: 60vh; overflow-y: auto; }
+.search-results .item {
+  padding: 12px 14px; border-radius: var(--radius-xs); cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.search-results .item:hover { background: var(--bg-accent); }
+.search-results .name { font-weight: 600; color: var(--text-dark); }
+.search-results .meta { font-size: 12px; color: var(--text-muted); }
 
-  .empty, .error {
-    padding: 40px;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 14px;
-  }
-  .error { color: var(--hfk-red); }
+/* Profile header */
+.profile-head {
+  background: #fff; padding: 32px 28px; border-radius: var(--radius);
+  border: 1px solid var(--border-light); margin-bottom: 36px;
+}
+.profile-name { font-size: 28px; font-weight: 700; color: var(--hfk-burgundy); margin: 0 0 6px; letter-spacing: -0.02em; }
+.profile-sub { color: var(--text-light); font-size: 14px; margin: 0 0 14px; }
+.profile-narrative { color: var(--text); font-size: 14px; margin: 0 0 24px; line-height: 1.7; }
+.profile-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+.stat-item { font-size: 13px; color: var(--text-muted); }
+.stat-item b { color: var(--hfk-burgundy); font-size: 18px; font-weight: 700; display: block; line-height: 1.2; margin-bottom: 3px; letter-spacing: -0.01em; }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 32px; }
+.timeline::before {
+  content: ''; position: absolute; left: 11px; top: 8px; bottom: 8px;
+  width: 2px; background: var(--hfk-sand);
+}
+.season-card {
+  position: relative; margin-bottom: 24px; background: #fff;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 1px var(--border-light);
+  padding: 20px 22px;
+}
+.season-card::before {
+  content: ''; position: absolute; left: -26px;
+  top: 33px;  /* padding-top(20) + 팀명(18px line)의 중앙 근사 */
+  width: 12px; height: 12px;
+  border-radius: 50%; background: var(--hfk-red);
+  transform: translateY(-50%);
+}
+.season-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.season-main { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; min-width: 0; }
+.season-label { font-weight: 600; color: var(--text-muted); font-size: 12px; letter-spacing: 0.03em; }
+.season-team { color: var(--hfk-burgundy); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
+.season-tag {
+  display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px;
+  font-weight: 600; vertical-align: middle; margin-left: 4px;
+}
+.tag-first { background: var(--bg-accent); color: var(--hfk-burgundy); }
+.tag-return { background: var(--hfk-red); color: #fff; }
+.season-motiv { font-size: 14px; color: var(--text); margin: 10px 0 0; padding: 14px 16px; background: var(--bg-accent); border-radius: var(--radius-xs); white-space: pre-wrap; line-height: 1.6; }
+.season-motiv-empty { color: var(--text-muted); font-style: italic; }
+
+.fourl-toggle {
+  margin-top: 16px; padding: 8px 12px; background: transparent;
+  border: 1px solid var(--border); border-radius: var(--radius-xs);
+  cursor: pointer; font-family: inherit; font-size: 13px; color: var(--text);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.fourl-toggle:hover { background: var(--bg-accent); }
+.fourl-toggle .arrow { transition: transform 0.2s; }
+.fourl-toggle.open .arrow { transform: rotate(90deg); }
+.fourl-body { margin-top: 12px; display: none; }
+.fourl-body.open { display: block; }
+.round-card {
+  background: var(--hfk-white); border-radius: var(--radius-xs);
+  padding: 12px 14px; margin-bottom: 10px;
+}
+.round-title { font-weight: 600; color: var(--hfk-burgundy); font-size: 13px; margin: 0 0 6px; }
+.round-raw { font-size: 13px; color: var(--text); white-space: pre-wrap; line-height: 1.7; }
+
+/* Season pill (이번 시즌 탭 안에서 시즌 전환) */
+.season-pill-row {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.season-pill {
+  padding: 6px 14px; background: var(--bg-accent); border: 1px solid var(--border-light);
+  border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600;
+  color: var(--text-light); font-family: inherit;
+  transition: all 0.15s;
+}
+.season-pill:hover { background: var(--hfk-cream); }
+.season-pill.active { background: var(--hfk-burgundy); color: #fff; border-color: var(--hfk-burgundy); }
+
+/* Tab navigation */
+.tab-nav {
+  display: flex; gap: 4px; margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-light);
+}
+.tab-btn {
+  padding: 14px 22px; background: transparent; border: 0;
+  font-family: inherit; font-size: 15px; font-weight: 700;
+  color: var(--text-muted); cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--hfk-burgundy); border-bottom-color: var(--hfk-red); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* 이번 시즌 리포트 (기존 hfk-member-report 디자인 톤) */
+.report-info-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin-bottom: 28px;
+}
+.report-info-item {
+  padding: 16px 18px; background: #faf6ef; border-radius: var(--radius-xs);
+}
+.report-info-item .label {
+  font-size: 10px; color: var(--hfk-red); font-weight: 700;
+  letter-spacing: 0.1em; margin-bottom: 6px; text-transform: uppercase;
+}
+.report-info-item .value { font-size: 15px; font-weight: 700; color: var(--hfk-charcoal); }
+
+.report-section { margin-bottom: 24px; }
+.report-section-title {
+  font-size: 12px; font-weight: 700; color: var(--hfk-red);
+  margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--hfk-cream);
+  letter-spacing: 0.06em;
+}
+
+.attendance-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+}
+.attendance-table th {
+  background: var(--hfk-cream); padding: 10px 8px;
+  font-weight: 600; color: var(--hfk-burgundy); text-align: center;
+  border-bottom: 1px solid var(--hfk-light-sand); font-size: 11px;
+}
+.attendance-table th:first-child { text-align: left; }
+.attendance-table td {
+  padding: 12px 8px; text-align: center;
+  border-bottom: 1px solid var(--hfk-white);
+}
+.attendance-table td:first-child { text-align: left; font-weight: 500; }
+.att-icon { font-size: 16px; font-weight: 700; }
+.att-icon.yes { color: #2d8a4e; }
+.att-icon.no { color: var(--hfk-coral); }
+.att-icon.na { color: var(--hfk-light-sand); }
+
+.rate-bar-container { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.rate-label { font-size: 13px; color: var(--hfk-burgundy); min-width: 96px; opacity: 0.7; }
+.rate-bar { flex: 1; height: 12px; background: var(--hfk-white); border-radius: 6px; overflow: hidden; }
+.rate-bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s; }
+.rate-bar-fill.high { background: #2d8a4e; }
+.rate-bar-fill.mid { background: var(--hfk-sand); }
+.rate-bar-fill.low { background: var(--hfk-coral); }
+.rate-value { font-size: 14px; font-weight: 700; min-width: 44px; text-align: right; color: var(--hfk-charcoal); }
+
+.insight-box {
+  background: #faf6ef; border-radius: var(--radius-xs);
+  padding: 16px 20px; margin-bottom: 10px;
+}
+.insight-box h4 { font-size: 12px; font-weight: 700; color: var(--hfk-red); margin: 0 0 8px; letter-spacing: 0.04em; }
+.insight-box p { font-size: 13px; line-height: 1.7; color: var(--text-dark); margin: 0; white-space: pre-wrap; }
+
+/* Track flow chart (Sankey-lite) */
+.track-flow-card {
+  background: #fff; border: 1px solid var(--border-light); border-radius: var(--radius);
+  padding: 28px 24px; margin-bottom: 36px;
+}
+.track-flow-title {
+  font-size: 13px; color: var(--text-muted); margin: 0 0 20px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.track-flow-scroll { overflow-x: auto; padding-bottom: 8px; }
+.track-flow-svg { display: block; min-width: 100%; }
+.track-legend {
+  display: flex; flex-wrap: wrap; gap: 12px 20px; margin-top: 22px;
+  font-size: 12px; color: var(--text-muted);
+}
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+/* Custom tooltip */
+.flow-tooltip {
+  position: fixed; pointer-events: none; z-index: 1000;
+  background: var(--hfk-charcoal); color: #fff;
+  padding: 8px 12px; border-radius: var(--radius-xs);
+  font-size: 12px; line-height: 1.5;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  opacity: 0; transition: opacity 0.12s;
+  max-width: 240px;
+}
+.flow-tooltip.visible { opacity: 1; }
+.flow-tooltip .tt-season { font-weight: 700; color: var(--hfk-salmon, #ff9a92); margin-bottom: 2px; }
+.flow-tooltip .tt-team { font-weight: 600; }
+.flow-tooltip .tt-meta { color: #ccc; font-size: 11px; margin-top: 4px; }
+
+.track-flow-svg circle.dot { cursor: pointer; transition: r 0.1s; }
+.track-flow-svg circle.dot:hover { r: 9; }
+
+/* 여정: 과거 → 다음 시즌 (ceremonial 전환) */
+.journey-bridge {
+  position: relative;
+  margin: 24px 0 16px;
+  padding: 48px 20px 44px;
+  text-align: center;
+}
+.journey-bridge::before {
+  /* 가운데 정렬된 이 영역에서 좌측 sand 타임라인선 마스킹 */
+  content: '';
+  position: absolute; left: 9px; top: 0; bottom: 0;
+  width: 6px; background: var(--bg-warm);
+}
+.bridge-label {
+  display: inline-block;
+  font-size: 11px; font-weight: 700;
+  color: #fff; letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  background: #980000;
+  border-radius: 20px;
+  margin-bottom: 28px;
+}
+
+/* 미래 시즌 카드 (추천) — season-card와 동일 축에 배치되면서 시각적으로 구분 */
+.season-card.future {
+  background: #fff;
+}
+.season-card.future::before {
+  background: #fff;
+  box-shadow: 0 0 0 2px var(--hfk-red);
+}
+.rec-track-pill {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 11px; font-weight: 600; color: #fff;
+}
+.rec-headline { font-size: 13px; color: var(--text-light); margin-bottom: 8px; font-style: italic; }
+.rec-reason { font-size: 14px; color: var(--text); line-height: 1.7; margin: 6px 0 0; }
+.rec-cta {
+  display: inline-block; margin-top: 14px;
+  font-size: 13px; font-weight: 600; color: var(--hfk-red);
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.rec-cta:hover { color: var(--hfk-burgundy); }
+
+/* 마지막 과거 시즌 후 추천 직전: 여정 헤드라인 */
+.journey-intro {
+  padding: 0;
+}
+.journey-intro-emph {
+  color: var(--hfk-burgundy); font-size: 20px; font-weight: 700;
+  margin: 0 0 12px; letter-spacing: -0.02em; line-height: 1.5;
+}
+.journey-intro-body {
+  margin: 0 auto; max-width: 420px;
+  color: var(--text-light); font-size: 14px; line-height: 1.8;
+}
+
+/* Empty/error states */
+.empty {
+  text-align: center; padding: 60px 20px; color: var(--text-muted);
+}
+.empty h2 { color: var(--hfk-burgundy); font-weight: 700; }
+
+@media (max-width: 480px) {
+  .wrap { padding: 16px 14px 60px; }
+  .profile-name { font-size: 22px; }
+  .profile-stats { gap: 16px; }
+  .stat-item b { font-size: 16px; }
+}
+
+/* === Admin 전용 === */
+.admin-header {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--bg-warm);
+  border-bottom: 1px solid var(--border-light);
+  padding: 16px 20px;
+  margin: -32px -20px 24px;
+}
+.admin-header h1 {
+  margin: 0 0 4px; font-size: 18px; font-weight: 700;
+  color: var(--hfk-burgundy); letter-spacing: -0.01em;
+}
+.admin-header .sub {
+  font-size: 12px; color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.admin-toolbar {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+}
+.admin-toolbar input, .admin-toolbar select {
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  font-size: 13px; font-family: inherit;
+  background: #fff;
+}
+.admin-toolbar input { flex: 1 1 200px; min-width: 0; }
+.admin-toolbar input:focus, .admin-toolbar select:focus {
+  outline: none; border-color: var(--hfk-burgundy);
+}
+.admin-stats {
+  font-size: 12px; color: var(--text-muted);
+  margin-left: auto;
+}
+.admin-stats b { color: var(--hfk-burgundy); }
+
+.member-block {
+  margin-bottom: 56px;
+  padding-bottom: 40px;
+  border-bottom: 2px dashed var(--border-light);
+  scroll-margin-top: 120px;
+}
+.member-block:last-child { border-bottom: 0; }
+.member-block.hidden { display: none; }
+
+.admin-loading, .admin-error {
+  text-align: center; padding: 60px 20px;
+  color: var(--text-muted);
+}
+.admin-error { color: var(--hfk-coral); }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
+  <div class="admin-header">
     <h1>HFK 멤버 로드맵 관리자</h1>
-    <div class="sub">전체 멤버 그리드 · 카드 클릭 시 해당 멤버 로드맵 페이지로 이동</div>
-  </header>
-
-  <div class="toolbar">
-    <input type="text" id="search" placeholder="이름·회사·직무·팀 검색...">
-    <select id="filter-reg">
-      <option value="all">전체 등록</option>
-      <option value="returning">재등록만</option>
-      <option value="first">첫등록만</option>
-    </select>
-    <select id="filter-season">
-      <option value="all">전체 시즌</option>
-    </select>
-    <div class="stats" id="stats"></div>
+    <div class="sub">시즌별 전체 멤버 로드맵을 한 페이지에서 조회</div>
+    <div class="admin-toolbar">
+      <select id="adminSeason"></select>
+      <input id="adminSearch" type="text" placeholder="이름·회사·직무·팀 검색...">
+      <div class="admin-stats" id="adminStats"></div>
+    </div>
   </div>
-
-  <div id="grid" class="grid"></div>
+  <div id="app"></div>
 </div>
 
 <script>
-const ADMIN_INDEX_URL = 'https://skaug12.github.io/hfk-dashboards/data/admin_index.json';
+const DATA_BASE = 'https://skaug12.github.io/hfk-dashboards/data';
+const ADMIN_SEASONS_URL = DATA_BASE + '/admin_seasons.json';
+const ADMIN_FULL_URL = season => DATA_BASE + '/admin_full_' + encodeURIComponent(season) + '.json';
+
+const TOKEN_RE = /^[0-9a-f]{16}$/;
 const MEMBER_PAGE_BASE = 'https://skaug12.github.io/hfk-dashboards/member.html';
 
-const $ = id => document.getElementById(id);
-const escapeHtml = s => (s ?? '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
-let ALL = [];
+function renderInvalid(title, msg) {
+  const root = document.getElementById('app');
+  root.innerHTML = `<div class="empty"><h2>${escapeHtml(title)}</h2><p>${escapeHtml(msg)}</p></div>`;
+}
 
-function render() {
-  const q = $('search').value.trim().toLowerCase();
-  const reg = $('filter-reg').value;
-  const season = $('filter-season').value;
+const TRACK_COLORS = {
+  'Vertical':     '#441a15',  // burgundy
+  'Horizontal':   '#970101',  // red
+  'Enrichment':   '#ff6154',  // coral
+  'Realignment':  '#ff9a92',  // salmon (가시성 ↑ sand → salmon)
+  'New Horizons': '#2d2523',  // charcoal
+  '미등록':          '#bbb',
+};
 
-  const filtered = ALL.filter(m => {
-    if (reg === 'returning' && !m.returning) return false;
-    if (reg === 'first' && m.returning) return false;
-    if (season !== 'all' && m.latest_season !== season) return false;
-    if (q) {
-      const hay = [m.name, m.company, m.function, m.latest_team].filter(Boolean).join(' ').toLowerCase();
-      if (!hay.includes(q)) return false;
-    }
-    return true;
-  });
+// 시즌 키 정렬용 (26봄 < 26여름 < 26가을 < 26겨울)
+const SEASON_ORDER_Q = { '봄': 1, '여름': 2, '가을': 3, '겨울': 4 };
+function seasonKeyOrder(k) {
+  const m = (k || '').match(/^(\d{2})(봄|여름|가을|겨울)/);
+  return m ? parseInt(m[1]) * 4 + (SEASON_ORDER_Q[m[2]] || 9) : 0;
+}
 
-  $('stats').innerHTML = `<b>${filtered.length}</b>명 / 전체 ${ALL.length}명`;
+function renderSeasonReport(r, seasonKey, member) {
+  // r = { team, partner, schedule, dates, attendance, events, events_meta, season_label, insights? }
+  const dates = r.dates || [];
+  const att = r.attendance || [];
+  const events = r.events || [];
+  const eventsMeta = r.events_meta || [];
 
-  if (!filtered.length) {
-    $('grid').innerHTML = '<div class="empty">검색 결과 없음</div>';
-    return;
+  function attCell(v) {
+    if (v === true) return '<td><span class="att-icon yes">✓</span></td>';
+    if (v === false) return '<td><span class="att-icon no">✗</span></td>';
+    return '<td><span class="att-icon na">·</span></td>';
   }
 
-  $('grid').innerHTML = filtered.map(m => {
-    const tags = [];
-    if (m.returning) tags.push(`<span class="tag returning">재등록 ${m.total_count}회</span>`);
-    else tags.push('<span class="tag first">첫등록</span>');
-    if (m.has_4l) tags.push('<span class="tag has-4l">4L</span>');
+  const sRows = att.map(attCell).join('');
+  const eRows = events.map(attCell).join('');
 
-    const meta = [];
-    if (m.company) meta.push(`<span>${escapeHtml(m.company)}</span>`);
-    if (m.function) meta.push(`<span>${escapeHtml(m.function)}</span>`);
-    if (m.years_now != null) meta.push(`<span>${m.years_now}년차</span>`);
+  const sPresent = att.filter(v => v === true).length;
+  const sTotal = att.filter(v => v !== null && v !== undefined).length;
+  const sRate = sTotal ? Math.round(sPresent / sTotal * 100) : null;
 
-    const seasonLine = m.latest_season
-      ? `<div class="card-meta" style="margin-top:6px;"><span>최근: ${escapeHtml(m.latest_season)} · ${escapeHtml(m.latest_team || '-')}</span></div>`
+  const ePresent = events.filter(v => v === true).length;
+  const eTotal = events.filter(v => v !== null && v !== undefined).length;
+  const eRate = eTotal ? Math.round(ePresent / eTotal * 100) : null;
+
+  const oTotal = sTotal + eTotal;
+  const oRate = oTotal ? Math.round((sPresent + ePresent) / oTotal * 100) : null;
+
+  function rc(rate) { if (rate == null) return 'mid'; if (rate >= 75) return 'high'; if (rate >= 50) return 'mid'; return 'low'; }
+  function rd(rate) { return rate == null ? '—' : `${rate}%`; }
+
+  const partner = r.partner || {};
+  const partnerLine = partner.name + (partner.company ? ` (${partner.company})` : '');
+
+  // seasonKey로 member.seasons에서 해당 시즌 동기/4L 찾기
+  const SEASON_SHORT_RE = (key) => new RegExp(`(?:20${key.slice(0,2)}.{0,15}?${key.slice(2)}|^${key})`);
+  const memberSeason = (member.seasons || []).find(s => SEASON_SHORT_RE(seasonKey).test(s.season_raw || s.season || ''));
+
+  // GROWTH INSIGHTS: 참여 현황 → 4L 요약 (전체 보기 토글) → 체크포인트
+  let insightsBlock = '';
+  {
+    const ins = r.insights || {};
+    const sr = member.season_report || {};
+    const rawRounds = (memberSeason && memberSeason.review_4l && memberSeason.review_4l.rounds) || [];
+    const fourLBoxRaw = rawRounds.length
+      ? `<details class="fourl-full-toggle" style="margin-top:10px;">
+          <summary style="cursor:pointer;font-size:12px;color:var(--hfk-red);font-weight:600;padding:6px 0;">전체 보기 (${rawRounds.length}회차)</summary>
+          <div style="margin-top:8px;">
+            ${rawRounds.map(rd => `
+              <div style="background:#fff;border-radius:var(--radius-xs);padding:12px 14px;margin-bottom:8px;">
+                <div style="font-size:11px;font-weight:700;color:var(--hfk-red);margin-bottom:4px;">${escapeHtml(rd.title || (rd.number + '회차'))}</div>
+                <p style="font-size:12px;line-height:1.6;color:var(--text-dark);margin:0;white-space:pre-wrap;">${escapeHtml(rd.raw)}</p>
+              </div>
+            `).join('')}
+          </div>
+        </details>`
       : '';
+    const blocks = [];
+    if (memberSeason && memberSeason.motivation) {
+      blocks.push(`<div class="insight-box"><h4>등록 동기</h4><p>${escapeHtml(memberSeason.motivation)}</p></div>`);
+    }
+    if (ins.participation) {
+      blocks.push(`<div class="insight-box"><h4>참여 현황</h4><p>${escapeHtml(ins.participation)}</p></div>`);
+    }
+    if (sr.fourL || fourLBoxRaw) {
+      const summary = sr.fourL ? `<p>${escapeHtml(sr.fourL)}</p>` : '';
+      blocks.push(`<div class="insight-box"><h4>4L 요약</h4>${summary}${fourLBoxRaw}</div>`);
+    }
+    if (ins.observation) {
+      blocks.push(`<div class="insight-box"><h4>체크포인트</h4><p>${escapeHtml(ins.observation)}</p></div>`);
+    }
+    if (blocks.length) {
+      insightsBlock = `
+        <div class="report-section">
+          <div class="report-section-title">GROWTH INSIGHTS</div>
+          ${blocks.join('')}
+        </div>`;
+    }
+  }
 
-    return `<a class="card" href="${MEMBER_PAGE_BASE}?t=${encodeURIComponent(m.token)}" target="_blank" rel="noopener">
-      <div class="card-name">${escapeHtml(m.name)}</div>
-      <div class="card-meta">${meta.join('')}</div>
-      ${seasonLine}
-      <div class="card-tags">${tags.join('')}</div>
-    </a>`;
-  }).join('');
+  // 등록 동기는 GROWTH INSIGHTS 안으로 이동, 별도 섹션 제거
+  let motivBlock = '';
+  let fourlBlock = '';
+
+  return `
+    <div class="report-info-grid">
+      <div class="report-info-item"><div class="label">TEAM</div><div class="value">${escapeHtml(r.team)}</div></div>
+      <div class="report-info-item"><div class="label">SEASON</div><div class="value">${escapeHtml(r.season_label || '')}</div></div>
+    </div>
+    <div class="report-section">
+      <div class="report-section-title">TEAM SESSION ATTENDANCE</div>
+      <table class="attendance-table">
+        <thead><tr>
+          <th style="width:60px;">구분</th>
+          ${dates.map((d, i) => `<th>${i+1}회차<br><span style="font-weight:400;font-size:10px;color:var(--hfk-light-sand);">${escapeHtml(d)}</span></th>`).join('')}
+        </tr></thead>
+        <tbody><tr><td>참석</td>${sRows}</tr></tbody>
+      </table>
+    </div>
+    ${eventsMeta.length ? `
+      <div class="report-section">
+        <div class="report-section-title">EVENT ATTENDANCE</div>
+        <table class="attendance-table">
+          <thead><tr>
+            <th style="width:60px;">구분</th>
+            ${eventsMeta.map(ev => `<th>${escapeHtml(ev.name)}<br><span style="font-weight:400;font-size:10px;color:var(--hfk-light-sand);">${escapeHtml(ev.date || '')}</span></th>`).join('')}
+          </tr></thead>
+          <tbody><tr><td>참석</td>${eRows}</tr></tbody>
+        </table>
+      </div>` : ''}
+    <div class="report-section">
+      <div class="report-section-title">ATTENDANCE RATE</div>
+      <div class="rate-bar-container"><span class="rate-label">Team Session</span><div class="rate-bar"><div class="rate-bar-fill ${rc(sRate)}" style="width:${sRate??0}%"></div></div><span class="rate-value">${rd(sRate)}</span></div>
+      <div class="rate-bar-container"><span class="rate-label">Events</span><div class="rate-bar"><div class="rate-bar-fill ${rc(eRate)}" style="width:${eRate??0}%"></div></div><span class="rate-value">${rd(eRate)}</span></div>
+      <div class="rate-bar-container"><span class="rate-label" style="font-weight:600;">Overall</span><div class="rate-bar"><div class="rate-bar-fill ${rc(oRate)}" style="width:${oRate??0}%"></div></div><span class="rate-value">${rd(oRate)}</span></div>
+    </div>
+    ${motivBlock}
+    ${insightsBlock}
+    ${renderHfkSeasonReport(member.season_report, memberSeason, member)}
+  `;
 }
 
-function populateSeasons(seasons) {
-  const sel = $('filter-season');
-  // 최신 시즌이 위에 오도록 역순
-  [...seasons].reverse().forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s; opt.textContent = s;
-    sel.appendChild(opt);
+function renderHfkSeasonReport(sr, memberSeason, member) {
+  if (!sr && !member) return '';
+  // 4L 요약은 GROWTH INSIGHTS로 이동. From HFK는 비슷한 멤버들의 흐름 → 다음 시즌 제안 순.
+  const sp = sr && sr.similarPeers && (sr.similarPeers.summary_stats || sr.similarPeers.summary_narrative)
+    ? `<div class="insight-box"><h4>비슷한 멤버들의 흐름</h4>
+        ${sr.similarPeers.summary_stats ? `<p>${escapeHtml(sr.similarPeers.summary_stats)}</p>` : ''}
+        ${sr.similarPeers.summary_narrative ? `<p style="margin-top:8px;">${escapeHtml(sr.similarPeers.summary_narrative)}</p>` : ''}
+      </div>`
+    : '';
+
+  // 다음 시즌 제안: recommendations_26여름.picks 사용 (성장 로드맵과 동일 데이터)
+  const picks = (member && member.recommendations_26여름 && member.recommendations_26여름.picks) || [];
+  const ns = picks.length
+    ? `<div class="insight-box"><h4>다음 시즌 제안</h4>
+        ${picks.map(t => {
+          const url = t.product_url;
+          const teamLabel = url
+            ? `<a href="${url}" target="_blank" style="color:var(--hfk-burgundy);text-decoration:underline;font-weight:700;">${escapeHtml(t.team)}</a>`
+            : `<strong>${escapeHtml(t.team)}</strong>`;
+          const trackText = t.track ? `${t.track} 트랙` : '';
+          return `<p style="margin-top:10px;">${teamLabel}${trackText ? `<span style="font-size:11px;color:var(--hfk-red);margin-left:6px;">${escapeHtml(trackText)}</span>` : ''}<br>${escapeHtml(t.reason || '')}</p>`;
+        }).join('')}
+      </div>`
+    : '';
+
+  if (!sp && !ns) return '';
+  return `<div class="report-section">
+    <div class="report-section-title">From HFK</div>
+    ${sp}${ns}
+  </div>`;
+}
+
+// 26여름 팀 imweb 상품 URL 매핑 (TBD: 정확한 URL은 사용자 확인 후 갱신)
+const TEAM_PRODUCT_URLS = {
+  // 'AI부사수': 'https://hfk.kr/...',
+};
+function teamProductUrl(teamName) {
+  return TEAM_PRODUCT_URLS[teamName] || null;
+}
+
+function renderTrackFlow(member, tracks) {
+  // 미등록 트랙 시즌이 실제로 있을 때만 레인 표시
+  const hasUnmapped = member.seasons.some(s => !s.track);
+  const lanes = hasUnmapped ? [...tracks, '미등록'] : [...tracks];
+  const laneY = {};
+  const LANE_H = 36;
+  const PAD_TOP = 28;         // 상단 연도 라벨 자리
+  const PAD_LEFT = 96;
+  const PAD_BOTTOM = 48;      // 2줄 라벨 (팀명 + 시즌)
+  lanes.forEach((t, i) => { laneY[t] = PAD_TOP + i * LANE_H + LANE_H / 2; });
+
+  // 시간 인덱스: 연×4 + 분기(봄=1, 여름=2, 가을=3, 겨울=4)
+  const QUARTER = { '봄': 1, '여름': 2, '가을': 3, '겨울': 4 };
+  function timeIdx(season) {
+    const m = season.match(/^(\d{2})(봄|여름|가을|겨울)/);
+    return m ? parseInt(m[1]) * 4 + QUARTER[m[2]] : 0;
+  }
+  const rawTimes = member.seasons.map(s => timeIdx(s.season));
+  // 같은 분기 중복은 0.3 단위로 미세 이동 (단조 증가 보장)
+  const times = [rawTimes[0]];
+  for (let i = 1; i < rawTimes.length; i++) {
+    times.push(rawTimes[i] <= times[i - 1] ? times[i - 1] + 0.3 : rawTimes[i]);
+  }
+  const minT = times[0];
+  const maxT = times[times.length - 1];
+  const spanT = Math.max(maxT - minT, 1);
+  const PX_PER_QUARTER = 72;  // 분기당 px. 빈 분기가 많을수록 선이 길어짐
+  const X_FIRST = PAD_LEFT + 46;
+  const W = X_FIRST + spanT * PX_PER_QUARTER + 40;
+  const H = PAD_TOP + lanes.length * LANE_H + PAD_BOTTOM;
+
+  const dots = member.seasons.map((s, i) => {
+    const t = s.track || '미등록';
+    const teamLabel = (s.team_normalized || s.team || '—').slice(0, 6);
+    return {
+      x: X_FIRST + (times[i] - minT) * PX_PER_QUARTER,
+      y: laneY[t],
+      season: s.season,
+      team: s.team,
+      teamLabel: teamLabel,
+      track: t,
+      type: s.type,
+      isLatest: i === member.seasons.length - 1,
+      hideLabel: false,
+    };
+  });
+  // 간격 좁은 dot의 라벨 숨김 (레이블 겹침 방지, 툴팁은 유지)
+  for (let i = 1; i < dots.length; i++) {
+    if (dots[i].x - dots[i-1].x < 44) dots[i].hideLabel = true;
+  }
+
+  // 연결선: 시간 흐름 방향 강조 (점선 아님, 색은 sand → 최신은 coral)
+  const lineSegs = [];
+  for (let i = 1; i < dots.length; i++) {
+    const color = i === dots.length - 1 ? 'var(--hfk-coral)' : 'var(--hfk-sand)';
+    lineSegs.push(`<line x1="${dots[i-1].x}" y1="${dots[i-1].y}" x2="${dots[i].x}" y2="${dots[i].y}" stroke="${color}" stroke-width="2.5" stroke-linecap="round" />`);
+  }
+
+  const laneBg = lanes.map((t, i) => {
+    const y = PAD_TOP + i * LANE_H + LANE_H / 2;
+    const color = t === '미등록' ? '#bbb' : TRACK_COLORS[t];
+    return `
+      <text x="${PAD_LEFT - 12}" y="${y + 4}" text-anchor="end" font-size="11" fill="${color}" font-weight="600">${t}</text>
+      <line x1="${PAD_LEFT}" y1="${y}" x2="${W - 8}" y2="${y}" stroke="#f0f0f0" stroke-width="1" />
+    `;
+  }).join('');
+
+  // 분기/연도 그리드
+  const gridTop = PAD_TOP - 4;
+  const gridBottom = H - PAD_BOTTOM + 6;
+  const firstQuarter = Math.ceil(minT - 0.01);
+  const lastQuarter = Math.floor(maxT + 0.01);
+  const gridMarkers = [];
+  for (let q = firstQuarter; q <= lastQuarter + 1; q++) {
+    const x = X_FIRST + (q - minT) * PX_PER_QUARTER;
+    if (x < PAD_LEFT - 4 || x > W - 16) continue;
+    const isYearStart = q % 4 === 1; // 봄
+    if (isYearStart) {
+      const year = Math.floor(q / 4);
+      gridMarkers.push(`
+        <line x1="${x}" y1="${gridTop}" x2="${x}" y2="${gridBottom}"
+          stroke="#b5a48d" stroke-width="1" stroke-dasharray="3 4" opacity="0.7" />
+        <text x="${x}" y="${PAD_TOP - 12}" text-anchor="middle" font-size="11" fill="#777" font-weight="700">'${year}</text>
+      `);
+    } else {
+      gridMarkers.push(`
+        <line x1="${x}" y1="${gridTop}" x2="${x}" y2="${gridBottom}"
+          stroke="#c8b99f" stroke-width="1" stroke-dasharray="2 4" opacity="0.5" />
+      `);
+    }
+  }
+  const yearMarkup = gridMarkers.join('');
+
+  const dotMarkup = dots.map(d => `
+    <circle class="dot" cx="${d.x}" cy="${d.y}" r="${d.isLatest ? 9 : 7}" fill="${TRACK_COLORS[d.track]}" stroke="#fff" stroke-width="${d.isLatest ? 3 : 2}"
+      data-season="${escapeHtml(d.season)}"
+      data-team="${escapeHtml(d.team || '—')}"
+      data-track="${escapeHtml(d.track)}"
+      data-type="${escapeHtml(d.type || '')}"></circle>
+    ${d.hideLabel ? '' : `
+      <text x="${d.x}" y="${H - 22}" text-anchor="middle" font-size="12" fill="#222" font-weight="700">${escapeHtml(d.teamLabel)}</text>
+      <text x="${d.x}" y="${H - 8}" text-anchor="middle" font-size="10" fill="#888">${escapeHtml(d.season)}</text>
+    `}
+  `).join('');
+
+  // 오른쪽 끝 화살표 (다음으로 이어지는 느낌)
+  const lastDot = dots[dots.length - 1];
+  const arrowMarkup = `
+    <line x1="${lastDot.x + 14}" y1="${lastDot.y}" x2="${W - 18}" y2="${lastDot.y}" stroke="var(--hfk-coral)" stroke-width="2" stroke-dasharray="3 4" stroke-linecap="round" />
+    <polygon points="${W - 18},${lastDot.y - 4} ${W - 10},${lastDot.y} ${W - 18},${lastDot.y + 4}" fill="var(--hfk-coral)" />
+  `;
+
+  const legend = lanes.map(t => `
+    <span class="legend-item">
+      <span class="legend-dot" style="background:${TRACK_COLORS[t]}"></span>${escapeHtml(t)}
+    </span>
+  `).join('');
+
+  return `
+    <div class="track-flow-card">
+      <div class="track-flow-title">성장 트랙</div>
+      <div class="track-flow-scroll">
+        <svg class="track-flow-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
+          ${yearMarkup}
+          ${laneBg}
+          ${lineSegs.join('')}
+          ${arrowMarkup}
+          ${dotMarkup}
+        </svg>
+      </div>
+      <div class="track-legend">${legend}</div>
+    </div>
+  `;
+}
+
+function renderFutureCards(member) {
+  const rec = member.recommendations_26여름;
+  if (!rec || !rec.picks || !rec.picks.length) return '';
+  const bridge = `
+    <div class="journey-bridge">
+      <span class="bridge-label">다음 시즌 · 26여름</span>
+      <div class="journey-intro">
+        <p class="journey-intro-emph">${escapeHtml(member.name)}님의 성장은 중요합니다.</p>
+        <p class="journey-intro-body">지난 ${member.total_count}시즌의 흐름을 보고 HFK가 추천하는 다음 3팀입니다.</p>
+      </div>
+    </div>
+  `;
+  const items = rec.picks.map((p, i) => {
+    const color = TRACK_COLORS[p.track] || '#999';
+    return `
+      <div class="season-card future">
+        <div class="season-head">
+          <div class="season-main">
+            <span class="season-label">26여름</span>
+            <span class="season-team">${escapeHtml(p.team)}</span>
+          </div>
+          <span class="season-tag" style="background:${color}; color:#fff;">${escapeHtml(p.track || '미지정')}</span>
+        </div>
+        ${p.headline ? `<div class="rec-headline">${escapeHtml(p.headline)}</div>` : ''}
+        <p class="rec-reason">${escapeHtml(p.reason)}</p>
+        ${p.product_url ? `<a class="rec-cta" href="${escapeHtml(p.product_url)}" target="_blank" rel="noopener">팀 소개 보기 →</a>` : ''}
+      </div>
+    `;
+  }).join('');
+  return bridge + items;
+}
+
+function renderProfile(member, tracks, rootEl) {
+  const root = rootEl || document.getElementById('app');
+  root.className = (root.className || '') + ' profile-view';
+
+  const sub = [member.company, member.function, member.years_now && (member.years_now + '년차')].filter(Boolean).join(' · ');
+
+  // multi-season report: 여러 시즌 데이터 있으면 pill로 전환
+  const seasonReports = member.season_reports || (member.current_season_report ? {auto: member.current_season_report} : {});
+  const seasonKeys = Object.keys(seasonReports).sort((a, b) => seasonKeyOrder(a) - seasonKeyOrder(b));
+  const latestSeasonKey = seasonKeys.length ? seasonKeys[seasonKeys.length - 1] : null;
+
+  let reportHtml = '';
+  if (latestSeasonKey) {
+    const pillRow = seasonKeys.length > 1 ? `
+      <div class="season-pill-row">
+        ${seasonKeys.map(k => `<button class="season-pill ${k === latestSeasonKey ? 'active' : ''}" data-season="${escapeHtml(k)}">${escapeHtml(k)}</button>`).join('')}
+      </div>
+    ` : '';
+    const reportSections = seasonKeys.map(k => `
+      <div class="season-report-content" data-season="${escapeHtml(k)}" style="${k === latestSeasonKey ? '' : 'display:none;'}">
+        ${renderSeasonReport(seasonReports[k], k, member)}
+      </div>
+    `).join('');
+    reportHtml = pillRow + reportSections;
+  }
+
+  const trackFlowHtml = (member.seasons.length >= 1 && tracks && tracks.length)
+    ? renderTrackFlow(member, tracks)
+    : '';
+  const futureHtml = renderFutureCards(member);
+
+  const narrative = member.total_count >= 2
+    ? `${escapeHtml(member.first_season)}에 시작해 ${escapeHtml(member.latest_season)}까지, HFK에서 ${member.total_count}시즌을 보냈습니다.`
+    : `${escapeHtml(member.latest_season)}에 HFK 첫 시즌을 시작했습니다.`;
+
+  // 시즌 카드 HTML 분리: 26봄 카드 (이번 시즌 탭용) vs 그 외 (로드맵 탭용)
+  const seasonHtmlList = member.seasons.map((s) => {
+    const isReturning = s.type === '재등록';
+    const cls = isReturning ? 'returning' : 'first';
+    const tagClass = isReturning ? 'tag-return' : 'tag-first';
+    const motiv = s.motivation
+      ? `<div class="season-motiv">${escapeHtml(s.motivation)}</div>`
+      : `<div class="season-motiv season-motiv-empty">등록 동기 미입력</div>`;
+    let fourlHtml = '';
+    if (s.review_4l && s.review_4l.rounds.length) {
+      const rounds = s.review_4l.rounds.map(r => `
+        <div class="round-card">
+          <div class="round-title">${escapeHtml(r.title || (r.number + '회차'))}</div>
+          <div class="round-raw">${escapeHtml(r.raw)}</div>
+        </div>
+      `).join('');
+      fourlHtml = `
+        <button class="fourl-toggle" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open')">
+          <span class="arrow">▶</span> 4L 회고 ${s.review_4l.rounds.length}건 보기
+        </button>
+        <div class="fourl-body">${rounds}</div>
+      `;
+    }
+    const html = `
+      <div class="season-card ${cls}">
+        <div class="season-head">
+          <div class="season-main">
+            <span class="season-label">${escapeHtml(s.season)}</span>
+            <span class="season-team">${escapeHtml(s.team || '—')}</span>
+          </div>
+          <span class="season-tag ${tagClass}">${escapeHtml(s.type || '—')}</span>
+        </div>
+        ${motiv}
+        ${fourlHtml}
+      </div>
+    `;
+    return { html };
+  });
+
+  const allSeasonsTimelineHtml = seasonHtmlList.map(x => x.html).join('');
+
+  // 탭 콘텐츠 결정
+  const hasReport = !!reportHtml;
+  const hasRoadmap = allSeasonsTimelineHtml || futureHtml;
+
+  // 탭 1: 이번 시즌 리포트 (시즌 pill + 출석/이벤트/동기/4L)
+  const reportTab = reportHtml;
+  // 탭 2: 성장 로드맵 (트랙 차트 + 모든 시즌 timeline + 다음 시즌)
+  const roadmapTab = `${trackFlowHtml}<div class="timeline">${allSeasonsTimelineHtml}${futureHtml}</div>`;
+
+  let tabsHtml;
+  if (hasReport && hasRoadmap) {
+    tabsHtml = `
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="report">이번 시즌</button>
+        <button class="tab-btn" data-tab="roadmap">성장 로드맵</button>
+      </div>
+      <div class="tab-content active" id="tab-report">${reportTab}</div>
+      <div class="tab-content" id="tab-roadmap">${roadmapTab}</div>
+    `;
+  } else if (hasReport) {
+    tabsHtml = reportTab;
+  } else {
+    tabsHtml = roadmapTab;
+  }
+
+  root.innerHTML = `
+    <div class="profile-head">
+      <h1 class="profile-name">${escapeHtml(member.name)}</h1>
+      <p class="profile-sub">${escapeHtml(sub || '정보 없음')}</p>
+      <p class="profile-narrative">${narrative}</p>
+      <div class="profile-stats">
+        <div class="stat-item"><b>${member.total_count}</b>총 시즌</div>
+        <div class="stat-item"><b>${escapeHtml(member.first_season)}</b>첫 등록</div>
+        <div class="stat-item"><b>${escapeHtml(member.latest_season)}</b>가장 최근</div>
+      </div>
+    </div>
+    ${tabsHtml}
+  `;
+  attachTabs(root);
+  attachTooltip(root);
+}
+
+function attachTabs(scope) {
+  scope = scope || document;
+  scope.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      scope.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      scope.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      const tabContent = scope.querySelector('#tab-' + btn.dataset.tab) || scope.querySelector('.tab-content');
+      if (tabContent) tabContent.classList.add('active');
+    });
+  });
+  // 시즌 pill (이번 시즌 탭 안)
+  scope.querySelectorAll('.season-pill').forEach(p => {
+    p.addEventListener('click', () => {
+      const k = p.dataset.season;
+      scope.querySelectorAll('.season-pill').forEach(b => b.classList.remove('active'));
+      p.classList.add('active');
+      scope.querySelectorAll('.season-report-content').forEach(c => {
+        c.style.display = c.dataset.season === k ? '' : 'none';
+      });
+    });
   });
 }
 
-fetch(ADMIN_INDEX_URL)
+function attachTooltip(scope) {
+  scope = scope || document;
+  const dots = scope.querySelectorAll('.track-flow-svg circle.dot');
+  if (!dots.length) return;
+
+  let tt = document.getElementById('flow-tt');
+  if (!tt) {
+    tt = document.createElement('div');
+    tt.id = 'flow-tt';
+    tt.className = 'flow-tooltip';
+    document.body.appendChild(tt);
+  }
+
+  function show(e) {
+    const c = e.currentTarget;
+    const season = c.dataset.season;
+    const team = c.dataset.team;
+    const track = c.dataset.track;
+    const type = c.dataset.type;
+    tt.innerHTML = `
+      <div class="tt-season">${season}</div>
+      <div class="tt-team">${team}</div>
+      <div class="tt-meta">${track}${type ? ' · ' + type : ''}</div>
+    `;
+    tt.classList.add('visible');
+    move(e);
+  }
+
+  function move(e) {
+    const x = e.clientX + 14;
+    const y = e.clientY + 14;
+    // 화면 우측/하단 넘침 방지
+    const rect = tt.getBoundingClientRect();
+    const maxX = window.innerWidth - rect.width - 10;
+    const maxY = window.innerHeight - rect.height - 10;
+    tt.style.left = Math.min(x, maxX) + 'px';
+    tt.style.top = Math.min(y, maxY) + 'px';
+  }
+
+  function hide() {
+    tt.classList.remove('visible');
+  }
+
+  dots.forEach(d => {
+    d.addEventListener('mouseenter', show);
+    d.addEventListener('mousemove', move);
+    d.addEventListener('mouseleave', hide);
+    // 모바일 터치
+    d.addEventListener('touchstart', e => { show({currentTarget: d, clientX: e.touches[0].clientX, clientY: e.touches[0].clientY}); });
+    d.addEventListener('touchend', () => setTimeout(hide, 1500));
+  });
+}
+
+// === Admin: 시즌별 전체 멤버 풀 펼침 ===
+const $app = document.getElementById('app');
+const $stats = document.getElementById('adminStats');
+const $search = document.getElementById('adminSearch');
+const $seasonSel = document.getElementById('adminSeason');
+
+let CURRENT_DATA = null;  // { season, tracks, members }
+
+function renderAll(data) {
+  CURRENT_DATA = data;
+  const tracks = data.tracks || [];
+  const members = data.members || [];
+  $app.innerHTML = '';
+  $stats.innerHTML = `<b>${members.length}</b>명`;
+
+  members.forEach(m => {
+    const block = document.createElement('section');
+    block.className = 'member-block';
+    block.id = 'm-' + (m.token || '');
+    block.dataset.search = [m.name, m.company, m.function, ...(m.seasons || []).map(s => s.team)].filter(Boolean).join(' ').toLowerCase();
+    $app.appendChild(block);
+    try {
+      renderProfile(m, tracks, block);
+    } catch (e) {
+      console.error('renderProfile error', m.name, e);
+      block.innerHTML = `<div class="admin-error">렌더 실패: ${m.name} (${e.message || e})</div>`;
+    }
+  });
+
+  applyFilter();
+}
+
+function applyFilter() {
+  const q = ($search.value || '').trim().toLowerCase();
+  let visible = 0;
+  document.querySelectorAll('.member-block').forEach(b => {
+    const hay = b.dataset.search || '';
+    const ok = !q || hay.includes(q);
+    b.classList.toggle('hidden', !ok);
+    if (ok) visible++;
+  });
+  if (CURRENT_DATA) {
+    $stats.innerHTML = q
+      ? `<b>${visible}</b>/${CURRENT_DATA.members.length}명`
+      : `<b>${CURRENT_DATA.members.length}</b>명`;
+  }
+}
+
+function loadSeason(season) {
+  $app.innerHTML = '<div class="admin-loading">로드 중...</div>';
+  fetch(ADMIN_FULL_URL(season))
+    .then(r => {
+      if (!r.ok) throw new Error('admin_full_' + season + '.json 로드 실패 (' + r.status + ')');
+      return r.json();
+    })
+    .then(renderAll)
+    .catch(err => {
+      console.error(err);
+      $app.innerHTML = `<div class="admin-error">${err.message || err}</div>`;
+    });
+}
+
+// 초기 로드
+fetch(ADMIN_SEASONS_URL)
   .then(r => {
-    if (!r.ok) throw new Error('admin_index.json 로드 실패 (' + r.status + ')');
+    if (!r.ok) throw new Error('admin_seasons.json 로드 실패 (' + r.status + ')');
     return r.json();
   })
-  .then(data => {
-    ALL = data.members || [];
-    populateSeasons(data.season_order || []);
-    ['search', 'filter-reg', 'filter-season'].forEach(id => $(id).addEventListener('input', render));
-    render();
+  .then(d => {
+    const seasons = d.seasons || [];
+    if (!seasons.length) {
+      $app.innerHTML = '<div class="admin-error">노출 가능한 시즌 데이터 없음</div>';
+      return;
+    }
+    seasons.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.season;
+      opt.textContent = s.season + ' (' + s.count + '명)';
+      $seasonSel.appendChild(opt);
+    });
+    // 가장 최근 시즌이 마지막에 오도록 가정. 첫 옵션 = 가장 오래된 시즌이라면 마지막을 default로.
+    const defaultIdx = seasons.length - 1;
+    $seasonSel.selectedIndex = defaultIdx;
+    loadSeason(seasons[defaultIdx].season);
   })
   .catch(err => {
-    $('grid').innerHTML = `<div class="error">${escapeHtml(err.message || String(err))}</div>`;
     console.error(err);
+    $app.innerHTML = `<div class="admin-error">${err.message || err}</div>`;
   });
+
+$seasonSel.addEventListener('change', () => loadSeason($seasonSel.value));
+$search.addEventListener('input', () => {
+  // 디바운스 가벼운 처리
+  clearTimeout(window.__adminFilterTimer);
+  window.__adminFilterTimer = setTimeout(applyFilter, 120);
+});
 </script>
 </body>
 </html>
