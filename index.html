@@ -738,13 +738,12 @@ function renderFutureCards(member) {
   `;
   const items = rec.picks.map((p, i) => {
     const color = TRACK_COLORS[p.track] || '#999';
-    const altBadge = (fall && p.is_alt) ? `<span style="display:inline-block;margin-left:8px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:#970101;color:#fff;">교대 추천</span>` : '';
     return `
       <div class="season-card future">
         <div class="season-head">
           <div class="season-main">
             <span class="season-label">${seasonLabel}</span>
-            <span class="season-team">${escapeHtml(p.team)}${altBadge}</span>
+            <span class="season-team">${escapeHtml(p.team)}</span>
           </div>
           <span class="season-tag" style="background:${color}; color:#fff;">${escapeHtml(p.track || '미지정')}</span>
         </div>
