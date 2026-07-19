@@ -551,8 +551,11 @@ function renderHfkSeasonReport(sr, memberSeason, member) {
       </div>`
     : '';
 
-  // 다음 시즌 제안: recommendations_26여름.picks 사용 (성장 로드맵과 동일 데이터)
-  const picks = (member && member.recommendations_26여름 && member.recommendations_26여름.picks) || [];
+  // 다음 시즌 제안: 26가을 우선, 없으면 26여름 (성장 로드맵과 동일 데이터)
+  const picks = (member && (
+    (member.recommendations_26가을 && member.recommendations_26가을.picks)
+    || (member.recommendations_26여름 && member.recommendations_26여름.picks)
+  )) || [];
   const ns = picks.length
     ? `<div class="insight-box"><h4>다음 시즌 제안</h4>
         ${picks.map(t => {
@@ -717,25 +720,31 @@ function renderTrackFlow(member, tracks) {
 }
 
 function renderFutureCards(member) {
-  const rec = member.recommendations_26여름;
+  const fall = member.recommendations_26가을;
+  const rec = fall || member.recommendations_26여름;  // 가을 없으면 26여름 유지
   if (!rec || !rec.picks || !rec.picks.length) return '';
+  const seasonLabel = fall ? '26가을' : '26여름';
+  const emph = (fall && fall.intro_emph) ? fall.intro_emph : (member.name + '님의 성장은 중요합니다.');
+  const body = (fall && fall.intro_body) ? fall.intro_body
+    : ('지난 ' + member.total_count + '시즌의 흐름을 보고 HFK가 추천하는 다음 3팀입니다.');
   const bridge = `
     <div class="journey-bridge">
-      <span class="bridge-label">다음 시즌 · 26여름</span>
+      <span class="bridge-label">다음 시즌 · ${seasonLabel}</span>
       <div class="journey-intro">
-        <p class="journey-intro-emph">${escapeHtml(member.name)}님의 성장은 중요합니다.</p>
-        <p class="journey-intro-body">지난 ${member.total_count}시즌의 흐름을 보고 HFK가 추천하는 다음 3팀입니다.</p>
+        <p class="journey-intro-emph">${escapeHtml(emph)}</p>
+        <p class="journey-intro-body">${escapeHtml(body)}</p>
       </div>
     </div>
   `;
   const items = rec.picks.map((p, i) => {
     const color = TRACK_COLORS[p.track] || '#999';
+    const altBadge = (fall && p.is_alt) ? `<span style="display:inline-block;margin-left:8px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:#970101;color:#fff;">교대 추천</span>` : '';
     return `
       <div class="season-card future">
         <div class="season-head">
           <div class="season-main">
-            <span class="season-label">26여름</span>
-            <span class="season-team">${escapeHtml(p.team)}</span>
+            <span class="season-label">${seasonLabel}</span>
+            <span class="season-team">${escapeHtml(p.team)}${altBadge}</span>
           </div>
           <span class="season-tag" style="background:${color}; color:#fff;">${escapeHtml(p.track || '미지정')}</span>
         </div>
