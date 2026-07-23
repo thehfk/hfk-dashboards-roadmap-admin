@@ -388,12 +388,12 @@ body {
 </div>
 
 <script>
-const DATA_BASE = 'https://skaug12.github.io/hfk-dashboards/data';
+const DATA_BASE = 'https://thehfk.github.io/hfk-dashboards/data';
 const ADMIN_SEASONS_URL = DATA_BASE + '/admin_seasons.json';
 const ADMIN_FULL_URL = season => DATA_BASE + '/admin_full_' + encodeURIComponent(season) + '.json';
 
 const TOKEN_RE = /^[0-9a-f]{16}$/;
-const MEMBER_PAGE_BASE = 'https://skaug12.github.io/hfk-dashboards/member.html';
+const MEMBER_PAGE_BASE = 'https://thehfk.github.io/hfk-dashboards/member.html';
 
 function escapeHtml(s) {
   return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
