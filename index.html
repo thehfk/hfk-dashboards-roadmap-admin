@@ -389,7 +389,8 @@ body {
 
 <script>
 const DATA_BASE = 'https://thehfk.github.io/hfk-dashboards/data';
-const ADMIN_SEASONS_URL = DATA_BASE + '/admin_seasons.json';
+// 전체 시즌 인덱스 사용 (18봄~ 모든 시즌). admin_seasons.json은 큐레이션(2시즌)만 담고 있어 사용하지 않음.
+const ADMIN_SEASONS_URL = DATA_BASE + '/jaeyoon_seasons.json';
 const ADMIN_FULL_URL = season => DATA_BASE + '/admin_full_' + encodeURIComponent(season) + '.json';
 
 const TOKEN_RE = /^[0-9a-f]{16}$/;
