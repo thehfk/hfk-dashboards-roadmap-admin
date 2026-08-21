@@ -390,8 +390,57 @@ body {
 <script>
 const DATA_BASE = 'https://thehfk.github.io/hfk-dashboards/data';
 // 전체 시즌 인덱스 사용 (18봄~ 모든 시즌). admin_seasons.json은 큐레이션(2시즌)만 담고 있어 사용하지 않음.
-const ADMIN_SEASONS_URL = DATA_BASE + '/jaeyoon_seasons.json';
-const ADMIN_FULL_URL = season => DATA_BASE + '/admin_full_' + encodeURIComponent(season) + '.json';
+// 2026-08-21: 이 사이트는 공개(PUBLIC) 저장소로 서빙된다. 시즌별 멤버 명단을 평문으로 두면
+// URL 만 알면 누구나 받아 갈 수 있어, AES-GCM 으로 암호화한 .enc 파일만 올린다.
+// 암호는 서버 어디에도 없고, 아래에서 입력받아 브라우저 안에서만 키로 바꾼다.
+const ENC_BASE = DATA_BASE + '/enc';
+const ADMIN_SEASONS_URL = ENC_BASE + '/manifest.json';          // 시즌·인원 집계만 (평문)
+const ADMIN_FULL_URL = season => ENC_BASE + '/admin_full_' + encodeURIComponent(season) + '.enc';
+const PASS_STORE = 'hfk_admin_pass';
+let ADMIN_KEY = null;      // CryptoKey
+let ADMIN_MANIFEST = null;
+
+function hexToBytes(hex) {
+  return Uint8Array.from(hex.match(/../g).map(h => parseInt(h, 16)));
+}
+
+async function deriveKey(pass, manifest) {
+  const base = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: hexToBytes(manifest.salt), iterations: manifest.iterations, hash: 'SHA-256' },
+    base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+}
+
+// 저장된 암호 → 없거나 틀리면 물어본다. 맞는지는 실제 복호화로 확인한다.
+async function ensureKey(manifest, probeSeason) {
+  for (let attempt = 0; attempt < 4; attempt++) {
+    let pass = attempt === 0 ? localStorage.getItem(PASS_STORE) : null;
+    if (!pass) {
+      pass = window.prompt(attempt === 0 ? '관리자 암호를 입력하세요' : '암호가 맞지 않습니다. 다시 입력하세요');
+      if (!pass) throw new Error('암호를 입력해야 조회할 수 있습니다');
+    }
+    const key = await deriveKey(pass, manifest);
+    try {
+      await decryptUrl(ADMIN_FULL_URL(probeSeason), key);   // 실제로 풀리는지 확인
+      localStorage.setItem(PASS_STORE, pass);
+      return key;
+    } catch (e) {
+      localStorage.removeItem(PASS_STORE);
+      if (e && e.__http) throw e;                            // 네트워크·404 는 암호 문제가 아니다
+    }
+  }
+  throw new Error('암호 확인에 실패했습니다');
+}
+
+async function decryptUrl(url, key) {
+  const r = await fetch(url);
+  if (!r.ok) { const e = new Error('데이터 로드 실패 (' + r.status + ')'); e.__http = true; throw e; }
+  const buf = new Uint8Array(await r.arrayBuffer());
+  const plain = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: buf.slice(0, 12) }, key, buf.slice(12));
+  return JSON.parse(new TextDecoder().decode(plain));
+}
 
 const TOKEN_RE = /^[0-9a-f]{16}$/;
 const MEMBER_PAGE_BASE = 'https://thehfk.github.io/hfk-dashboards/member.html';
@@ -1002,11 +1051,7 @@ function applyFilter() {
 
 function loadSeason(season) {
   $app.innerHTML = '<div class="admin-loading">로드 중...</div>';
-  fetch(ADMIN_FULL_URL(season))
-    .then(r => {
-      if (!r.ok) throw new Error('admin_full_' + season + '.json 로드 실패 (' + r.status + ')');
-      return r.json();
-    })
+  decryptUrl(ADMIN_FULL_URL(season), ADMIN_KEY)
     .then(renderAll)
     .catch(err => {
       console.error(err);
@@ -1014,14 +1059,18 @@ function loadSeason(season) {
     });
 }
 
-// 초기 로드
+// 초기 로드: 시즌 목록(집계) → 암호 확인 → 해당 시즌 복호화
 fetch(ADMIN_SEASONS_URL)
   .then(r => {
-    if (!r.ok) throw new Error('admin_seasons.json 로드 실패 (' + r.status + ')');
+    if (!r.ok) throw new Error('시즌 목록 로드 실패 (' + r.status + ')');
     return r.json();
   })
-  .then(d => {
+  .then(async d => {
     const seasons = d.seasons || [];
+    ADMIN_MANIFEST = d;
+    if (seasons.length) {
+      ADMIN_KEY = await ensureKey(d, seasons[seasons.length - 1].season);
+    }
     if (!seasons.length) {
       $app.innerHTML = '<div class="admin-error">노출 가능한 시즌 데이터 없음</div>';
       return;
