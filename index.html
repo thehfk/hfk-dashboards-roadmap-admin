@@ -1081,8 +1081,9 @@ fetch(ADMIN_SEASONS_URL)
       opt.textContent = s.season + ' (' + s.count + '명)';
       $seasonSel.appendChild(opt);
     });
-    // 가장 최근 시즌이 마지막에 오도록 가정. 첫 옵션 = 가장 오래된 시즌이라면 마지막을 default로.
-    const defaultIdx = seasons.length - 1;
+    // 매니페스트가 시간 순으로 정렬되고 현재 시즌을 default 로 준다. 없으면 마지막.
+    const found = seasons.findIndex(s => s.season === d.default);
+    const defaultIdx = found >= 0 ? found : seasons.length - 1;
     $seasonSel.selectedIndex = defaultIdx;
     loadSeason(seasons[defaultIdx].season);
   })
