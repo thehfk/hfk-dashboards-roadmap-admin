@@ -533,8 +533,9 @@ function renderSeasonReport(r, seasonKey, member) {
     if (ins.participation) {
       blocks.push(`<div class="insight-box"><h4>참여 현황</h4><p>${escapeHtml(ins.participation)}</p></div>`);
     }
-    if (sr.fourL || fourLBoxRaw) {
-      const summary = sr.fourL ? `<p>${escapeHtml(sr.fourL)}</p>` : '';
+    const fourLText = ins.fourL || sr.fourL;  // 검수한 인사이트 4L 이 우선
+    if (fourLText || fourLBoxRaw) {
+      const summary = fourLText ? `<p>${escapeHtml(fourLText)}</p>` : '';
       blocks.push(`<div class="insight-box"><h4>4L 요약</h4>${summary}${fourLBoxRaw}</div>`);
     }
     if (ins.observation) {
@@ -587,11 +588,11 @@ function renderSeasonReport(r, seasonKey, member) {
     </div>
     ${motivBlock}
     ${insightsBlock}
-    ${renderHfkSeasonReport(member.season_report, memberSeason, member)}
+    ${renderHfkSeasonReport(member.season_report, memberSeason, member, r.insights || {})}
   `;
 }
 
-function renderHfkSeasonReport(sr, memberSeason, member) {
+function renderHfkSeasonReport(sr, memberSeason, member, ins = {}) {
   if (!sr && !member) return '';
   // 4L 요약은 GROWTH INSIGHTS로 이동. From HFK는 비슷한 멤버들의 흐름 → 다음 시즌 제안 순.
   const sp = sr && sr.similarPeers && (sr.similarPeers.summary_stats || sr.similarPeers.summary_narrative)
@@ -601,22 +602,10 @@ function renderHfkSeasonReport(sr, memberSeason, member) {
       </div>`
     : '';
 
-  // 다음 시즌 제안: 26가을 우선, 없으면 26여름 (성장 로드맵과 동일 데이터)
-  const picks = (member && (
-    (member.recommendations_26가을 && member.recommendations_26가을.picks)
-    || (member.recommendations_26여름 && member.recommendations_26여름.picks)
-  )) || [];
-  const ns = picks.length
-    ? `<div class="insight-box"><h4>다음 시즌 제안</h4>
-        ${picks.map(t => {
-          const url = t.product_url;
-          const teamLabel = url
-            ? `<a href="${url}" target="_blank" style="color:var(--hfk-burgundy);text-decoration:underline;font-weight:700;">${escapeHtml(t.team)}</a>`
-            : `<strong>${escapeHtml(t.team)}</strong>`;
-          const trackText = t.track ? `${t.track} 트랙` : '';
-          return `<p style="margin-top:10px;">${teamLabel}${trackText ? `<span style="font-size:11px;color:var(--hfk-red);margin-left:6px;">${escapeHtml(trackText)}</span>` : ''}<br>${escapeHtml(t.reason || '')}</p>`;
-        }).join('')}
-      </div>`
+  // 다음 시즌 제안: 그 시즌 인사이트의 suggestion(검수본). 현재 시즌은 다음 시즌 앵콜 팀을 추천한다.
+  // 예전엔 recommendations_26가을·26여름(시즌 시작 전 추천)을 읽어 지난 팀이 '다음 시즌'으로 보였다(2026-10-17 슬기 지적)
+  const ns = ins.suggestion
+    ? `<div class="insight-box"><h4>다음 시즌 제안</h4><p>${escapeHtml(ins.suggestion)}</p></div>`
     : '';
 
   if (!sp && !ns) return '';
@@ -769,11 +758,14 @@ function renderTrackFlow(member, tracks) {
   `;
 }
 
+// 멤버 페이지와 같은 규칙: 다음 시즌(26겨울) 추천이 빌드돼 있을 때만 카드를 그린다.
+// 지난 시즌 추천(26가을·26여름)을 '다음 시즌'으로 보여 주지 않는다(2026-10-17)
+const NEXT_SEASON = '26겨울';
 function renderFutureCards(member) {
-  const fall = member.recommendations_26가을;
-  const rec = fall || member.recommendations_26여름;  // 가을 없으면 26여름 유지
+  const fall = member['recommendations_' + NEXT_SEASON];
+  const rec = fall;
   if (!rec || !rec.picks || !rec.picks.length) return '';
-  const seasonLabel = fall ? '26가을' : '26여름';
+  const seasonLabel = NEXT_SEASON;
   const emph = (fall && fall.intro_emph) ? fall.intro_emph : (member.name + '님의 성장은 중요합니다.');
   const body = (fall && fall.intro_body) ? fall.intro_body
     : ('지난 ' + member.total_count + '시즌의 흐름을 보고 HFK가 추천하는 다음 3팀입니다.');
